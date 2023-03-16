@@ -1,6 +1,4 @@
-# irei utilizar uma lista para representar meu indivíduo
-# a quantidade de elementos de uma lista é a quantidade de genes.
-# cada gene varia apenas de 0 ou 1.
+from random import choice
 
 def função_objetivo_cb(indivíduo):
     """Computa a função objetivo para um indivíduo
@@ -9,3 +7,22 @@ def função_objetivo_cb(indivíduo):
     Return:
         Um valor representando a soma dos genes do indivíduo."""
     return sum(indivíduo)
+
+def gene_cb():
+    """Gera um gene valido para um indivíduo
+    Return: 
+        Um valor entre 0 ou 1."""
+    genes = [0,1]
+    gene = choice(genes)
+    return(gene)
+    
+def indivíduo_cb(n):
+    """Gera um indivíduo para o problema das caixas binarias.
+    
+    Args:
+        n: número de genes do indivíduo.
+    Return:
+        Uma lista com n genes. Cada gene é um valor zero ou um.
+        """
+    indivíduo = [gene_cb() for i in range(n)]
+    return indivíduo
