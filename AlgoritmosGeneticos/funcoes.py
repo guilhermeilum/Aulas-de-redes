@@ -3,7 +3,7 @@ from random import choice, choices, randint, sample
 
 def gene_cb():
     """Gera um gene valido para um indivíduo
-    
+
     Return:
         Um valor entre 0 ou 1."""
     genes = [0, 1]
@@ -106,16 +106,18 @@ def func_objetivo_população(população):
     fitnnes = [função_objetivo_cb(individuo) for individuo in população]
     return fitnnes
 
+
 def gene_cnb(n):
     """Gera um gene valido para um indivíduo da caixa não binaria.
     Args:
         n: numero maximo da caixa.
     Return:
         Um valor entre 0 e n."""
-    gene = randint(0,n)
+    gene = randint(0, n)
     return gene
 
-def indivíduo_cnb(valor_maximo,n):
+
+def indivíduo_cnb(valor_maximo, n):
     """Gera um indivíduo para o problema das caixas não binarias.
 
     Args:
@@ -128,7 +130,7 @@ def indivíduo_cnb(valor_maximo,n):
     return indivíduo
 
 
-def população_caixas_n_binarias(valor_maximo,tamanho, n):
+def população_caixas_n_binarias(valor_maximo, tamanho, n):
     """Cria uma populção de caixas não binarias.
 
     arg:
@@ -137,11 +139,12 @@ def população_caixas_n_binarias(valor_maximo,tamanho, n):
     return:
         população: lista de individuos"""
     população = [
-        indivíduo_cnb(valor_maximo,n) for _ in range(tamanho)
+        indivíduo_cnb(valor_maximo, n) for _ in range(tamanho)
     ]  # sendo n o numero de individuos.
     return população
 
-def mutação_cnb(valor_maximo,indivíduo):
+
+def mutação_cnb(valor_maximo, indivíduo):
     """Realiza a mutação de um gene no problema das caixas não binárias
 
     Args:
@@ -154,6 +157,7 @@ def mutação_cnb(valor_maximo,indivíduo):
     indivíduo[gene_a_ser_mutado] = gene_cnb(valor_maximo)
     return indivíduo
 
+
 def função_objetivo_cnb(indivíduo):
     """Computa a função objetivo para um indivíduo
 
@@ -162,6 +166,7 @@ def função_objetivo_cnb(indivíduo):
     Return:
         Um valor representando a soma dos genes do indivíduo."""
     return sum(indivíduo)
+
 
 def func_objetivo_população_n_b(população):
     """Calcula a função objetivo para todos os membros de uma população.
@@ -176,8 +181,9 @@ def func_objetivo_população_n_b(população):
 
 
 ################################
-#SENHA
+# SENHA
 ################################################
+
 
 def gene_letra(letras):
     """Sorteia uma letra.
@@ -190,6 +196,7 @@ def gene_letra(letras):
     """
     letra = choice(letras)
     return letra
+
 
 def individuo_senha(tamanho_senha, letras):
     """Cria um candidato para o problema da senha
@@ -205,6 +212,7 @@ def individuo_senha(tamanho_senha, letras):
     candidato = [gene_letra(letras) for _ in range(tamanho_senha)]
 
     return candidato
+
 
 def populacao_inicial_senha(tamanho, tamanho_senha, letras):
     """Cria população inicial no problema da senha
@@ -261,6 +269,7 @@ def selecao_torneio_min(populacao, fitness, tamanho_torneio=3):
 
     return selecionados
 
+
 def mutacao_senha(individuo, letras):
     """Realiza a mutação de um gene no problema da senha.
 
@@ -295,6 +304,7 @@ def funcao_objetivo_senha(individuo, senha_verdadeira):
 
     return diferenca
 
+
 def funcao_objetivo_pop_senha(populacao, senha_verdadeira):
     """Computa a funcao objetivo de uma populaçao no problema da senha.
 
@@ -305,13 +315,17 @@ def funcao_objetivo_pop_senha(populacao, senha_verdadeira):
     Returns:
       Lista contendo os valores da métrica de distância entre senhas.
     """
-    resultado = [funcao_objetivo_senha(individuo, senha_verdadeira) for individuo in populacao]
+    resultado = [
+        funcao_objetivo_senha(individuo, senha_verdadeira) for individuo in populacao
+    ]
 
     return resultado
 
-########################################################################################## 
-#Senha sem tamanho
+
+##########################################################################################
+# Senha sem tamanho
 ###########################################
+
 
 def mutacao_tamanho_senha(individuo, letras, maximo):
     """Realiza a mutação de um gene no problema da senha.
@@ -324,17 +338,17 @@ def mutacao_tamanho_senha(individuo, letras, maximo):
     Return:
       Um individuo (senha) com um gene retirado ou adicionado.
     """
-    
-    n_mudar_tamanho = randint(1,maximo)
+
+    n_mudar_tamanho = randint(1, maximo)
     soma_ou_subtração = randint(0, 1)
-    
+
     if soma_ou_subtração:
         somar = [gene_letra(letras) for _ in range(n_mudar_tamanho)]
         individuo = individuo + somar
     else:
-        if n_mudar_tamanho > len(individuo):
-            n_mudar_tamanho = len(individuo)-1
-        subtrair = sample(individuo,n_mudar_tamanho)
+        if n_mudar_tamanho > len(individuo) - 1:
+            n_mudar_tamanho = len(individuo) - 1
+        subtrair = sample(individuo, n_mudar_tamanho)
         for gene in subtrair:
             individuo.remove(gene)
     return individuo
@@ -357,11 +371,9 @@ def funcao_objetivo_senha_sem_tamanho(individuo, senha_verdadeira):
     for letra_candidato, letra_oficial in zip(individuo, senha_verdadeira):
         diferenca += abs(ord(letra_candidato) - ord(letra_oficial))
 
+    delta_tamanho = abs(len(senha_verdadeira) - len(individuo)) * 10
+    diferenca += delta_tamanho
 
-    delta_tamanho = abs(len(senha_verdadeira)-len(individuo))*10
-    diferenca +=  delta_tamanho
-    
-    
     return diferenca
 
 
@@ -375,6 +387,9 @@ def funcao_objetivo_pop_senha_sem_tamanho(populacao, senha_verdadeira):
     Returns:
       Lista contendo os valores da métrica de distância entre senhas.
     """
-    resultado = [funcao_objetivo_senha_sem_tamanho(individuo, senha_verdadeira) for individuo in populacao]
+    resultado = [
+        funcao_objetivo_senha_sem_tamanho(individuo, senha_verdadeira)
+        for individuo in populacao
+    ]
 
     return resultado
