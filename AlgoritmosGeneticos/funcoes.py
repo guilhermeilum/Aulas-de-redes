@@ -1,4 +1,4 @@
-from random import choice, choices, randint
+from random import choice, choices, randint, sample
 
 
 def gene_cb():
@@ -173,3 +173,208 @@ def func_objetivo_população_n_b(população):
     Lista de valores representando os fitness dos individuos."""
     fitnnes = [função_objetivo_cnb(individuo) for individuo in população]
     return fitnnes
+
+
+################################
+#SENHA
+################################################
+
+def gene_letra(letras):
+    """Sorteia uma letra.
+
+    Args:
+      letras: letras possíveis de serem sorteadas.
+
+    Return:
+      Retorna uma letra dentro das possíveis de serem sorteadas.
+    """
+    letra = choice(letras)
+    return letra
+
+def individuo_senha(tamanho_senha, letras):
+    """Cria um candidato para o problema da senha
+
+    Args:
+      tamanho_senha: inteiro representando o tamanho da senha.
+      letras: letras possíveis de serem sorteadas.
+
+    Return:
+      Lista com n letras
+    """
+
+    candidato = [gene_letra(letras) for _ in range(tamanho_senha)]
+
+    return candidato
+
+def populacao_inicial_senha(tamanho, tamanho_senha, letras):
+    """Cria população inicial no problema da senha
+
+    Args
+      tamanho: tamanho da população.
+      tamanho_senha: inteiro representando o tamanho da senha.
+      letras: letras possíveis de serem sorteadas.
+
+    Returns:
+      Lista com todos os indivíduos da população no problema da senha.
+    """
+    populacao = [individuo_senha(tamanho_senha, letras) for _ in range(tamanho)]
+    return populacao
+
+
+def selecao_torneio_min(populacao, fitness, tamanho_torneio=3):
+    """Faz a seleção de uma população usando torneio.
+
+    Nota: da forma que está implementada, só funciona em problemas de
+    minimização.
+
+    Args:
+      populacao: população do problema
+      fitness: fitness de todos os individuos da população.
+      tamanho_torneio: quantidade de invidiuos que batalham entre si
+
+    Returns:
+      Individuos selecionados. Lista com os individuos selecionados com mesmo
+      tamanho do argumento `populacao`.
+    """
+    selecionados = []
+
+    # criamos essa variável para associar cada individuo com seu valor de fitness
+    par_populacao_fitness = list(zip(populacao, fitness))
+
+    # vamos fazer len(populacao) torneios! Que comecem os jogos!
+    for _ in range(len(populacao)):
+        combatentes = sample(par_populacao_fitness, tamanho_torneio)
+
+        # é assim que se escreve infinito em python
+        minimo_fitness = float("inf")
+
+        for par_individuo_fitness in combatentes:
+            individuo = par_individuo_fitness[0]
+            fit = par_individuo_fitness[1]
+
+            # queremos o individuo de menor fitness
+            if fit < minimo_fitness:
+                selecionado = individuo
+                minimo_fitness = fit
+
+        selecionados.append(selecionado)
+
+    return selecionados
+
+def mutacao_senha(individuo, letras):
+    """Realiza a mutação de um gene no problema da senha.
+
+    Args:
+      individuo: uma lista representado um individuo no problema da senha
+      letras: letras possíveis de serem sorteadas.
+
+    Return:
+      Um individuo (senha) com um gene mutado.
+    """
+    gene = randint(0, len(individuo) - 1)
+    individuo[gene] = gene_letra(letras)
+    return individuo
+
+
+def funcao_objetivo_senha(individuo, senha_verdadeira):
+    """Computa a funcao objetivo de um individuo no problema da senha
+
+    Args:
+      individiuo: lista contendo as letras da senha
+      senha_verdadeira: a senha que você está tentando descobrir
+
+    Returns:
+      A "distância" entre a senha proposta e a senha verdadeira. Essa distância
+      é medida letra por letra. Quanto mais distante uma letra for da que
+      deveria ser, maior é essa distância.
+    """
+    diferenca = 0
+
+    for letra_candidato, letra_oficial in zip(individuo, senha_verdadeira):
+        diferenca += abs(ord(letra_candidato) - ord(letra_oficial))
+
+    return diferenca
+
+def funcao_objetivo_pop_senha(populacao, senha_verdadeira):
+    """Computa a funcao objetivo de uma populaçao no problema da senha.
+
+    Args:
+      populacao: lista com todos os individuos da população
+      senha_verdadeira: a senha que você está tentando descobrir
+
+    Returns:
+      Lista contendo os valores da métrica de distância entre senhas.
+    """
+    resultado = [funcao_objetivo_senha(individuo, senha_verdadeira) for individuo in populacao]
+
+    return resultado
+
+########################################################################################## 
+#Senha sem tamanho
+###########################################
+
+def mutacao_tamanho_senha(individuo, letras, maximo):
+    """Realiza a mutação de um gene no problema da senha.
+
+    Args:
+      individuo: uma lista representado um individuo no problema da senha
+      letras: letras possíveis de serem sorteadas.
+      maximo: maximo de genes que podem ser retirados ou adicionados.
+
+    Return:
+      Um individuo (senha) com um gene retirado ou adicionado.
+    """
+    
+    n_mudar_tamanho = randint(1,maximo)
+    soma_ou_subtração = randint(0, 1)
+    
+    if soma_ou_subtração:
+        somar = [gene_letra(letras) for _ in range(n_mudar_tamanho)]
+        individuo = individuo + somar
+    else:
+        if n_mudar_tamanho > len(individuo):
+            n_mudar_tamanho = len(individuo)-1
+        subtrair = sample(individuo,n_mudar_tamanho)
+        for gene in subtrair:
+            individuo.remove(gene)
+    return individuo
+
+
+def funcao_objetivo_senha_sem_tamanho(individuo, senha_verdadeira):
+    """Computa a funcao objetivo de um individuo no problema da senha
+
+    Args:
+      individiuo: lista contendo as letras da senha
+      senha_verdadeira: a senha que você está tentando descobrir
+
+    Returns:
+      A "distância" entre a senha proposta e a senha verdadeira. Essa distância
+      é medida letra por letra. Quanto mais distante uma letra for da que
+      deveria ser, maior é essa distância. E pela distancia do tamanho da senha para o tamanho correto.
+    """
+    diferenca = 0
+
+    for letra_candidato, letra_oficial in zip(individuo, senha_verdadeira):
+        diferenca += abs(ord(letra_candidato) - ord(letra_oficial))
+
+
+    delta_tamanho = abs(len(senha_verdadeira)-len(individuo))*10
+    diferenca +=  delta_tamanho
+    
+    
+    return diferenca
+
+
+def funcao_objetivo_pop_senha_sem_tamanho(populacao, senha_verdadeira):
+    """Computa a funcao objetivo de uma populaçao no problema da senha.
+
+    Args:
+      populacao: lista com todos os individuos da população
+      senha_verdadeira: a senha que você está tentando descobrir
+
+    Returns:
+      Lista contendo os valores da métrica de distância entre senhas.
+    """
+    resultado = [funcao_objetivo_senha_sem_tamanho(individuo, senha_verdadeira) for individuo in populacao]
+
+    return resultado
