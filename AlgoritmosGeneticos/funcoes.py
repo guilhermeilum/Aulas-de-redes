@@ -1,4 +1,4 @@
-from random import choice, choices, randint, sample
+from random import choice, choices, randint, sample, random, shuffle
 
 
 def gene_cb():
@@ -391,5 +391,265 @@ def funcao_objetivo_pop_senha_sem_tamanho(populacao, senha_verdadeira):
         funcao_objetivo_senha_sem_tamanho(individuo, senha_verdadeira)
         for individuo in populacao
     ]
+
+    return resultado
+
+
+# NOVIDADE
+def distancia_entre_dois_pontos(a, b):
+    """Computa a distância Euclidiana entre dois pontos em R^2
+
+    Args:
+      a: lista contendo as coordenadas x e y de um ponto.
+      b: lista contendo as coordenadas x e y de um ponto.
+
+    Returns:
+      Distância entre as coordenadas dos pontos `a` e `b`.
+    """
+
+    x1 = a[0]
+    x2 = b[0]
+    y1 = a[1]
+    y2 = b[1]
+
+    dist = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** (1 / 2)
+
+    return dist
+
+
+# NOVIDADE
+def cria_cidades(n):
+    """Cria um dicionário aleatório de cidades com suas posições (x,y).
+
+    Args:
+      n: inteiro positivo, Número de cidades que serão visitadas pelo caixeiro.
+
+    Returns:
+      Dicionário contendo o nome das cidades como chaves e a coordenada no plano
+      cartesiano das cidades como valores.
+    """
+
+    cidades = {}
+
+    for i in range(n):
+        cidades[f"Cidade {i}"] = (random(), random())
+
+    return cidades
+
+
+# NOVIDADE
+def individuo_cv(cidades):
+    """Sorteia um caminho possível no problema do caixeiro viajante
+
+    Args:
+      cidades: Dicionário onde as chaves são os nomes das cidades e os valores são as coordenadas das cidades.
+
+    Return:
+      Retorna uma lista de nomes de cidades formando um caminho onde visitamos
+      cada cidade apenas uma vez.
+    """
+    nomes = list(cidades.keys())
+    shuffle(nomes)
+    return nomes
+
+
+# NOVIDADE
+def populacao_inicial_cv(tamanho, cidades):
+    """Cria população inicial no problema do caixeiro viajante.
+
+    Args
+      tamanho: Tamanho da população.
+      cidades: Dicionário onde as chaves são os nomes das cidades e os valores são as coordenadas das cidades.
+
+    Returns:
+      Lista com todos os indivíduos da população no problema do caixeiro
+      viajante.
+    """
+    populacao = []
+    for _ in range(tamanho):
+        populacao.append(individuo_cv(cidades))
+    return populacao
+
+
+# NOVIDADE
+def cruzamento_ordenado(pai, mae):
+    """Operador de cruzamento ordenado.
+
+    Neste cruzamento, os filhos mantém os mesmos genes que seus pais tinham,
+    porém em uma outra ordem. Trata-se de um tipo de cruzamento útil para
+    problemas onde a ordem dos genes é importante e não podemos alterar os genes
+    em si. É um cruzamento que pode ser usado no problema do caixeiro viajante.
+
+    Ver pág. 37 do livro do Wirsansky.
+
+    Args:
+      pai: uma lista representando um individuo
+      mae: uma lista representando um individuo
+
+    Returns:
+      Duas listas, sendo que cada uma representa um filho dos pais que foram os
+      argumentos. Estas listas mantém os genes originais dos pais, porém altera
+      a ordem deles
+    """
+    corte1 = randint(0, len(pai) - 2)
+    corte2 = randint(corte1 + 1, len(pai) - 1)
+    filho1 = pai[corte1:corte2]
+    for gene in mae:
+        if gene not in filho1:
+            filho1.append(gene)
+
+    filho2 = mae[corte1:corte2]
+    for gene in pai:
+        if gene not in filho2:
+            filho2.append(gene)
+
+    return filho1, filho2
+
+
+# NOVIDADE
+def mutacao_de_troca(individuo):
+    """Troca o valor de dois genes.
+
+    Args:
+      individuo: uma lista representado um individuo.
+
+    Return:
+      O indivíduo recebido como argumento, porém com dois dos seus genes
+      trocados de posição.
+    """
+    index1, index2 = sample(range(len(individuo)), k=2)
+    individuo[index1], individuo[index2] = individuo[index2], individuo[index1]
+    return individuo
+
+
+# NOVIDADE
+def funcao_objetivo_cv(individuo, cidades):
+    """Computa a funcao objetivo de um individuo no problema do caixeiro viajante.
+
+    Args:
+      individuo: Lista contendo a ordem das cidades que serão visitadas
+      cidades: Dicionário onde as chaves são os nomes das cidades e os valores são as coordenadas das cidades.
+
+    Returns:
+      distancia : A distância percorrida pelo caixeiro seguindo o caminho contido no
+      `individuo`. Lembrando que após percorrer todas as cidades em ordem, o
+      caixeiro retorna para a cidade original de onde começou sua viagem.
+    """
+
+    distancia = 0
+
+    for posicao in range(len(individuo) - 1):
+        partida = cidades[individuo[posicao]]
+        chegada = cidades[individuo[posicao + 1]]
+        distancia += distancia_entre_dois_pontos(partida, chegada)
+
+    partida = cidades[individuo[-1]]
+    chegada = cidades[individuo[0]]
+    distancia += distancia_entre_dois_pontos(partida, chegada)
+
+    return distancia
+
+
+# NOVIDADE
+def funcao_objetivo_pop_cv(populacao, cidades):
+    """Computa a funcao objetivo de uma população no problema do caixeiro viajante.
+
+    Args:
+      populacao: Lista com todos os inviduos da população
+      cidades: Dicionário onde as chaves são os nomes das cidades e os valores são as coordenadas das cidades.
+
+    Returns:
+      Lista contendo a distância percorrida pelo caixeiro para todos os
+      indivíduos da população.
+    """
+
+    resultado = [funcao_objetivo_cv(individuo, cidades) for individuo in populacao]
+
+    return resultado
+
+
+######################################################################## Mochila  ####################################
+
+
+def computa_mochila(individuo, objetos, ordem_dos_nomes):
+    """Computa o valor total e peso total de uma mochila
+
+    Args:
+      individiuo:
+        Lista binária contendo a informação de quais objetos serão selecionados.
+      objetos:
+        Dicionário onde as chaves são os nomes dos objetos e os valores são
+        dicionários com a informação do peso e valor.
+      ordem_dos_nomes:
+        Lista contendo a ordem dos nomes dos objetos.
+
+    Returns:
+      valor_total: valor total dos itens da mochila em unidades de dinheiros.
+      peso_total: peso total dos itens da mochila em unidades de massa.
+    """
+
+    valor_total = 0
+    peso_total = 0
+
+    for pegou_item, nome_item in zip(individuo, ordem_dos_nomes):
+        if pegou_item:
+            valor_total += objetos[nome_item]["valor"]
+            peso_total += objetos[nome_item]["peso"]
+
+    return valor_total, peso_total
+
+
+def funcao_objetivo_mochila(individuo, objetos, limite, ordem_dos_nomes):
+    """Computa a funcao objetivo de um candidato no problema da mochila.
+
+    Args:
+      individiuo:
+        Lista binária contendo a informação de quais objetos serão selecionados.
+      objetos:
+        Dicionário onde as chaves são os nomes dos objetos e os valores são
+        dicionários com a informação do peso e valor.
+      limite:
+        Número indicando o limite de peso que a mochila aguenta.
+      ordem_dos_nomes:
+        Lista contendo a ordem dos nomes dos objetos.
+
+    Returns:
+      Valor total dos itens inseridos na mochila considerando a penalidade para
+      quando o peso excede o limite.
+    """
+
+    valor_individuo, peso_individuo = computa_mochila(
+        individuo, objetos, ordem_dos_nomes
+    )
+
+    if peso_individuo > limite:
+        valor_individuo = 0.01
+
+    return valor_individuo
+
+
+def funcao_objetivo_pop_mochila(populacao, objetos, limite, ordem_dos_nomes):
+    """Computa a fun. objetivo de uma populacao no problema da mochila
+
+    Args:
+      populacao:
+        Lista com todos os individuos da população
+      objetos:
+        Dicionário onde as chaves são os nomes dos objetos e os valores são
+        dicionários com a informação do peso e valor.
+      limite:
+        Número indicando o limite de peso que a mochila aguenta.
+      ordem_dos_nomes:
+        Lista contendo a ordem dos nomes dos objetos.
+
+    Returns:
+      Lista contendo o valor dos itens da mochila de cada indivíduo.
+    """
+
+    resultado = []
+    for individuo in populacao:
+        resultado.append(
+            funcao_objetivo_mochila(individuo, objetos, limite, ordem_dos_nomes)
+        )
 
     return resultado
