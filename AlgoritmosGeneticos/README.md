@@ -8,7 +8,7 @@ A ideia do algoritimo genetico é muito interessante, utilizando a ideia de evol
 + [Experimento 4](experimento%20A.04%20-%20caixas%20nao-binarias.ipynb): Maximização das caixas não binárias.
 + [Experimento 5](experimento%20A.05%20-%20descobrindo%20a%20senha.ipynb): Um algoritimo para descobrir a senha.
 + [Experimento 6](experimento%20A.06%20-%20o%20caixeiro%20viajante.ipynb): o problema do caixeiro viajante resolvido por algoritimos geneticos.
-+[Experimento 7](experimento%20A.07%20-%20aplicando%20restricoes.ipynb): Algoritimo do problema da mochila com algoritimos geneticos.
++ [Experimento 7](experimento%20A.07%20-%20aplicando%20restricoes.ipynb): Algoritimo do problema da mochila com algoritimos geneticos.
 + Experimento 8, 9, 10: foi utilizado a biblioteca DEAP para realizar os algoritimos.
 + [Experimento GA.1](experimento%20GA.01%20-%20senha%20de%20tamanho%20variavel.ipynb): Descobrindo a senha com tamanho variavel.
 + [Experimento GA.6](experimento%20GA.06%20-%20Himmelblau%20e%20sua%20funcao.ipynb): minimo da função de Himmelblau, por algoritimos geneticos.
