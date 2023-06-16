@@ -1,4 +1,5 @@
-from random import choice, choices, randint, sample, random, shuffle
+from random import choice, choices, randint, sample, random, shuffle, uniform
+import numpy as np
 
 
 def gene_cb():
@@ -107,44 +108,55 @@ def func_objetivo_população(população):
     return fitnnes
 
 
-def gene_cnb(n):
+def gene_cnb(n, i=0, inteiro=True):
     """Gera um gene valido para um indivíduo da caixa não binaria.
     Args:
         n: numero maximo da caixa.
+        i: numero minimo da caixa.
+        iteiro: Se for False a caixa irá ter numeros float.
     Return:
         Um valor entre 0 e n."""
-    gene = randint(0, n)
+    if inteiro:
+        gene = randint(i, n)
+    else:
+        gene = uniform(i, n)
     return gene
 
 
-def indivíduo_cnb(valor_maximo, n):
+def indivíduo_cnb(valor_maximo, n, valor_minimo=0, inteiro=True):
     """Gera um indivíduo para o problema das caixas não binarias.
 
     Args:
         n: número de genes do indivíduo.
-        valor_maximo: Valor maximo para a caixa binaria
+        valor_maximo: Valor maximo para a caixa binaria.
+        valor_minimo: Valor minimo para a caixa binaria.
+        iteiro: Se for False a caixa irá ter numeros float.
     Return:
         Uma lista com n genes. Cada gene é um valor zero a valor_maximo.
     """
-    indivíduo = [gene_cnb(valor_maximo) for i in range(n)]
+    indivíduo = [gene_cnb(valor_maximo, valor_minimo, inteiro) for _ in range(n)]
     return indivíduo
 
 
-def população_caixas_n_binarias(valor_maximo, tamanho, n):
+def população_caixas_n_binarias(valor_maximo, tamanho, n, valor_minimo=0, inteiro=True):
     """Cria uma populção de caixas não binarias.
 
     arg:
         tamanho: quantos da população irá ter na caixa binarias.
         n: Quantidade de genes nas caixas binarias
+        valor_maximo: Valor maximo para a caixa binaria
+        valor_minimo: Valor minimo para a caixa binaria
+        iteiro: Se for False a caixa irá ter numeros float.
+
     return:
         população: lista de individuos"""
     população = [
-        indivíduo_cnb(valor_maximo, n) for _ in range(tamanho)
+        indivíduo_cnb(valor_maximo, n, valor_minimo, inteiro) for _ in range(tamanho)
     ]  # sendo n o numero de individuos.
     return população
 
 
-def mutação_cnb(valor_maximo, indivíduo):
+def mutacao_cnb(valor_maximo, indivíduo, valor_minimo=0, inteiro=True):
     """Realiza a mutação de um gene no problema das caixas não binárias
 
     Args:
@@ -154,7 +166,7 @@ def mutação_cnb(valor_maximo, indivíduo):
         Um individuo com um gene mutado.
     """
     gene_a_ser_mutado = randint(0, len(indivíduo) - 1)
-    indivíduo[gene_a_ser_mutado] = gene_cnb(valor_maximo)
+    indivíduo[gene_a_ser_mutado] = gene_cnb(valor_maximo, valor_minimo, inteiro)
     return indivíduo
 
 
@@ -653,3 +665,124 @@ def funcao_objetivo_pop_mochila(populacao, objetos, limite, ordem_dos_nomes):
         )
 
     return resultado
+
+
+def função_objetivo_Himmelblau(indivíduo):
+    """Computa a função objetivo para um indivíduo
+
+    Args:
+        Indivíduo: uma lista com cordenadas x,y.
+    Return:
+        Um valor representando a soma dos genes do indivíduo."""
+    x = indivíduo[0]
+    y = indivíduo[1]
+
+    return (x**2 + y - 11) ** 2 + (x + y**2 - 7) ** 2
+
+
+def função_objetivo_Himmelblau_pop(lista_individuos):
+    """Computa a funcao objetivo de uma populaçao no problema de Himmelblau.
+
+    Args:
+      lista_individuos: lista com a população de individuos.
+
+    Returns:
+      Lista contendo os valores da métrica de distância entre senhas.
+    """
+    resultado = [
+        função_objetivo_Himmelblau(individuo) for individuo in lista_individuos
+    ]
+
+    return resultado
+
+
+def função_objetivo_Rastrigin(indivíduo):
+    """Computa a função objetivo para um indivíduo
+
+    Args:
+        Indivíduo: uma lista com cordenadas x,y.
+    Return:
+        Um valor representando a soma dos genes do indivíduo."""
+    x = indivíduo[0]
+    y = indivíduo[1]
+
+    return (
+        20
+        + (x**2 - 10 * np.cos(2 * np.pi * x))
+        + (y**2 - 10 * np.cos(2 * np.pi * y))
+    )
+
+
+def função_objetivo_Rastrigin_pop(lista_individuos):
+    """Computa a funcao objetivo de uma populaçao no problema de Rastrigin.
+
+    Args:
+      lista_individuos: lista com a população de individuos.
+
+    Returns:
+      Lista contendo os valores da métrica de distância entre senhas.
+    """
+    resultado = [função_objetivo_Rastrigin(individuo) for individuo in lista_individuos]
+
+    return resultado
+
+
+def mutação_grossa(individuo):
+    # Mutação por passos peguenos
+    gene_a_ser_mutado = randint(0, len(individuo) - 1)
+    taxa = uniform(-1, 1)
+    individuo[gene_a_ser_mutado] = individuo[gene_a_ser_mutado] * (1 + taxa)
+    return individuo
+
+
+def mutação_media(individuo):
+    # Mutação por passos peguenos
+    gene_a_ser_mutado = randint(0, len(individuo) - 1)
+    taxa = uniform(-1, 1) / 10
+    individuo[gene_a_ser_mutado] = individuo[gene_a_ser_mutado] * (1 + taxa)
+    return individuo
+
+
+def mutação_fina(individuo):
+    # Mutação por passos peguenos
+    gene_a_ser_mutado = randint(0, len(individuo) - 1)
+    taxa = uniform(-1, 1) / 1000
+    individuo[gene_a_ser_mutado] = individuo[gene_a_ser_mutado] * (1 + taxa)
+    return individuo
+
+
+def mutação_Função(individuo, maximo, minimo):
+    # Mutação por passos peguenos
+    mutação = random()
+    variavel_min = 0.3
+    variavel_medio = 0.9
+    variavel_max = 0.98
+
+    if variavel_min < mutação < variavel_medio:
+        mutação_fina(individuo)
+        
+
+    elif variavel_medio < mutação < variavel_max:
+        mutação_grossa(individuo)
+        
+
+    elif mutação < variavel_min:
+        mutação_media(individuo)
+        
+    elif mutação > variavel_max:
+        mutacao_cnb(maximo, individuo, minimo, False)
+        
+        
+
+    return individuo
+    # Passos pequenos do gradiente.
+    # gene_a_ser_mutado = randint(0, len(individuo) - 1)
+    # taxa = random()/100
+    # x = individuo[0]
+    # y = individuo[1]
+    # if gene_a_ser_mutado == 0:
+    #     grad_x = 4 * x**3 + 4 * x * y - 42 * x + 2 * y**2 - 14
+    #     individuo[gene_a_ser_mutado] = individuo[gene_a_ser_mutado] - (grad_x * taxa)
+    # elif gene_a_ser_mutado == 1:
+    #     grad_y = 4 * y**3 + 4 * x * y - 26 * y + 2 * x**2 - 22
+    #     individuo[gene_a_ser_mutado] = individuo[gene_a_ser_mutado] - (grad_y * taxa)
