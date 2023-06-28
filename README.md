@@ -1,4 +1,4 @@
-# Template para a disciplina de Redes Neurais e Algoritmos Genéticos
+# Disciplina de Redes Neurais e Algoritmos Genéticos
 
 Diretorio relacionado a diciplina de Redes Neurais e Algoritmos Genéticos é ministrada pelo Prof. Dr. Daniel Cassar.
 
